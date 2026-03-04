@@ -4,8 +4,9 @@ import { ChatTab } from './components/ChatTab';
 import { VisionTab } from './components/VisionTab';
 import { VoiceTab } from './components/VoiceTab';
 import { ToolsTab } from './components/ToolsTab';
+import { SymptomCheckerTab } from './components/SymptomCheckerTab';
 
-type Tab = 'chat' | 'vision' | 'voice' | 'tools';
+type Tab = 'chat' | 'vision' | 'voice' | 'tools' | 'symptom';
 
 export function App() {
   const [sdkReady, setSdkReady] = useState(false);
@@ -48,21 +49,25 @@ export function App() {
 
       <nav className="tab-bar">
         <button className={activeTab === 'chat' ? 'active' : ''} onClick={() => setActiveTab('chat')}>
-          💬 Chat
+          Chat
+        </button>
+        <button className={activeTab === 'symptom' ? 'active' : ''} onClick={() => setActiveTab('symptom')}>
+          Medical Symptoms
         </button>
         <button className={activeTab === 'vision' ? 'active' : ''} onClick={() => setActiveTab('vision')}>
-          📷 Vision
+          Vision
         </button>
         <button className={activeTab === 'voice' ? 'active' : ''} onClick={() => setActiveTab('voice')}>
-          🎙️ Voice
+          Voice
         </button>
         <button className={activeTab === 'tools' ? 'active' : ''} onClick={() => setActiveTab('tools')}>
-          🔧 Tools
+          Tools
         </button>
       </nav>
 
       <main className="tab-content">
         {activeTab === 'chat' && <ChatTab />}
+        {activeTab === 'symptom' && <SymptomCheckerTab />}
         {activeTab === 'vision' && <VisionTab />}
         {activeTab === 'voice' && <VoiceTab />}
         {activeTab === 'tools' && <ToolsTab />}
