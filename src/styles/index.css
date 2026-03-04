@@ -1699,3 +1699,51 @@ body {
   background: var(--primary);
   color: white;
 }
+
+/* Enhanced transcription styles */
+.transcript-segment.enhanced {
+  border-left: 3px solid var(--primary);
+  background: linear-gradient(to right, rgba(255, 85, 0, 0.05), var(--bg-card));
+}
+
+.transcript-segment.enhanced .segment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.confidence-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  color: white;
+}
+
+.segment-duration {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.live-indicator {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: var(--red);
+  color: white;
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+.segment-text.streaming {
+  opacity: 0.9;
+  animation: text-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes text-pulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
