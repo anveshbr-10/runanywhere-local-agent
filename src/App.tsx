@@ -8,8 +8,9 @@ import { SymptomCheckerTab } from './components/SymptomCheckerTab';
 import { TranscriptionTab } from './components/TranscriptionTab';
 import { NotesTab } from './components/NotesTab';
 import { MeetingTab } from './components/MeetingTab';
+import { MultilingualTab } from './components/MultilingualTab';
 
-type Tab = 'chat' | 'vision' | 'voice' | 'tools' | 'symptom' | 'transcription' | 'notes' | 'meeting';
+type Tab = 'chat' | 'vision' | 'voice' | 'tools' | 'symptom' | 'transcription' | 'notes' | 'meeting' | 'multilingual';
 
 export function App() {
   const [sdkReady, setSdkReady] = useState(false);
@@ -60,6 +61,9 @@ export function App() {
         <button className={activeTab === 'transcription' ? 'active' : ''} onClick={() => setActiveTab('transcription')}>
           Transcription
         </button>
+        <button className={activeTab === 'multilingual' ? 'active' : ''} onClick={() => setActiveTab('multilingual')}>
+          Multilingual
+        </button>
         <button className={activeTab === 'notes' ? 'active' : ''} onClick={() => setActiveTab('notes')}>
           Notes
         </button>
@@ -81,6 +85,7 @@ export function App() {
         {activeTab === 'chat' && <ChatTab />}
         {activeTab === 'symptom' && <SymptomCheckerTab />}
         {activeTab === 'transcription' && <TranscriptionTab />}
+        {activeTab === 'multilingual' && <MultilingualTab />}
         {activeTab === 'notes' && <NotesTab />}
         {activeTab === 'meeting' && <MeetingTab />}
         {activeTab === 'vision' && <VisionTab />}
