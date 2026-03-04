@@ -900,3 +900,572 @@ body {
   color: var(--red);
   font-weight: 700;
 }
+
+/* ---------------------------------------------------------------------------
+ * Transcription tab
+ * --------------------------------------------------------------------------- */
+
+.transcription-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.transcription-header {
+  padding: 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.transcription-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.transcription-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.transcription-controls {
+  display: flex;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border-bottom: 1px solid var(--red);
+}
+
+.recording-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--red);
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.audio-level-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-input);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.audio-level-fill {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.1s;
+}
+
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  justify-content: center;
+}
+
+.transcript-container {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transcript-segment {
+  display: flex;
+  gap: 12px;
+  padding: 10px;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+}
+
+.transcript-segment.current {
+  background: rgba(255, 85, 0, 0.1);
+  border-left: 3px solid var(--primary);
+}
+
+.segment-time {
+  flex-shrink: 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  min-width: 70px;
+}
+
+.segment-text {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.segment-text.processing {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.feature-list {
+  margin-top: 16px;
+  text-align: left;
+  font-size: 14px;
+  line-height: 2;
+  color: var(--text-muted);
+}
+
+/* ---------------------------------------------------------------------------
+ * Notes tab
+ * --------------------------------------------------------------------------- */
+
+.notes-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.notes-header {
+  padding: 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.notes-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.notes-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.notes-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.notes-sidebar {
+  width: 280px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+}
+
+.notes-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.notes-sidebar-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.notes-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.note-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.note-item:hover {
+  background: var(--bg-input);
+}
+
+.note-item.selected {
+  background: var(--bg-input);
+  border-left: 3px solid var(--primary);
+}
+
+.note-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.note-item-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.note-item-tags {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+
+.notes-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.note-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.note-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.note-detail-header h2 {
+  font-size: 24px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.note-detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.note-detail-meta {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.note-summary {
+  padding: 16px;
+  background: rgba(34, 197, 94, 0.1);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.note-summary h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--green);
+}
+
+.note-summary p {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.note-content {
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+}
+
+.note-content h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--text-muted);
+}
+
+.note-content p {
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.note-recording {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.note-recording h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.status-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.current-transcript {
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  min-height: 150px;
+  margin-bottom: 16px;
+}
+
+.current-transcript p {
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.recording-controls {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ---------------------------------------------------------------------------
+ * Meeting tab
+ * --------------------------------------------------------------------------- */
+
+.meeting-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.meeting-header {
+  padding: 16px;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
+.meeting-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.meeting-header p {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.meeting-container {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.meeting-sidebar {
+  width: 280px;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+}
+
+.meeting-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.meeting-sidebar-header h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.meeting-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.meeting-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.meeting-item:hover {
+  background: var(--bg-input);
+}
+
+.meeting-item.selected {
+  background: var(--bg-input);
+  border-left: 3px solid var(--primary);
+}
+
+.meeting-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meeting-item-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.meeting-item-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.meeting-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+.meeting-active {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.meeting-active-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.meeting-active-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.meeting-transcript {
+  padding: 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  min-height: 400px;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.meeting-detail {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.meeting-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.meeting-detail-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  flex: 1;
+}
+
+.meeting-detail-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.meeting-detail-meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.meeting-summary {
+  padding: 16px;
+  background: rgba(34, 197, 94, 0.1);
+  border-left: 3px solid var(--green);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.meeting-summary h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--green);
+}
+
+.summary-text {
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.meeting-actions {
+  padding: 16px;
+  background: rgba(255, 85, 0, 0.1);
+  border-left: 3px solid var(--primary);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+
+.meeting-actions h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+
+.meeting-actions ul {
+  margin-left: 20px;
+}
+
+.meeting-actions li {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.meeting-transcript-section {
+  margin-top: 20px;
+}
+
+.meeting-transcript-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}

@@ -1,6 +1,6 @@
 # RunAnywhere Web Starter App
 
-A minimal React + TypeScript starter app demonstrating **on-device AI in the browser** using the [`@runanywhere/web`](https://www.npmjs.com/package/@runanywhere/web) SDK. All inference runs locally via WebAssembly — no server, no API key, 100% private.
+A comprehensive React + TypeScript application demonstrating **on-device AI in the browser** using the [`@runanywhere/web`](https://www.npmjs.com/package/@runanywhere/web) SDK. Features 8 powerful AI-driven tools — all running locally via WebAssembly with zero server dependencies and 100% privacy.
 
 ## Features
 
@@ -8,9 +8,28 @@ A minimal React + TypeScript starter app demonstrating **on-device AI in the bro
 |-----|-------------|
 | **Chat** | Stream text from an on-device LLM (LFM2 350M) |
 | **Medical Symptoms** | Analyze symptoms and get health recommendations using local AI |
+| **Transcription** | Real-time speech-to-text with automatic voice detection |
+| **Notes** | Voice notes with AI-powered titles, tags, and summarization |
+| **Meetings** | Record meetings with auto-transcription, summaries, and action items |
 | **Vision** | Point your camera and describe what the VLM sees (LFM2-VL 450M) |
 | **Voice** | Speak naturally — VAD detects speech, STT transcribes, LLM responds, TTS speaks back |
 | **Tools** | Function calling and structured output demonstrations |
+
+## Key Highlights
+
+### Privacy-First Architecture
+- **100% Local Processing**: All AI inference runs in your browser via WebAssembly
+- **No Server Calls**: Zero network requests for inference - completely offline-capable
+- **No Data Leakage**: Audio, text, images, and medical data never leave your device
+- **Persistent Models**: Models cached in OPFS (Origin Private File System) across sessions
+
+### Advanced AI Capabilities
+- **LLM**: Text generation with streaming, system prompts, and tool calling
+- **STT**: Speech-to-text transcription with Whisper models
+- **TTS**: Neural voice synthesis with Piper TTS
+- **VAD**: Real-time voice activity detection with Silero VAD
+- **VLM**: Vision language models for multimodal understanding
+- **Tool Calling**: Function calling with structured JSON output
 
 ## Quick Start
 
@@ -51,7 +70,7 @@ const result = await VLMWorkerBridge.shared.process(rgbPixels, width, height, 'D
 ```
 src/
 ├── main.tsx              # React root
-├── App.tsx               # Tab navigation (Chat | Symptoms | Vision | Voice | Tools)
+├── App.tsx               # Tab navigation (all 8 tabs)
 ├── runanywhere.ts        # SDK init + model catalog + VLM worker
 ├── workers/
 │   └── vlm-worker.ts     # VLM Web Worker entry (2 lines)
@@ -60,6 +79,9 @@ src/
 ├── components/
 │   ├── ChatTab.tsx              # LLM streaming chat
 │   ├── SymptomCheckerTab.tsx    # Medical symptom analysis
+│   ├── TranscriptionTab.tsx     # Real-time speech-to-text
+│   ├── NotesTab.tsx             # Voice notes with AI organization
+│   ├── MeetingTab.tsx           # Meeting recorder and analyzer
 │   ├── VisionTab.tsx            # Camera + VLM inference
 │   ├── VoiceTab.tsx             # Full voice pipeline
 │   ├── ToolsTab.tsx             # Function calling demo
@@ -121,6 +143,101 @@ The symptom checker uses:
 - Responsive UI with clear disclaimers and safety warnings
 
 See `src/components/SymptomCheckerTab.tsx` for the implementation details.
+
+## Real-Time Transcription
+
+The **Transcription** tab provides live speech-to-text transcription with automatic voice detection:
+
+### Features
+- **Automatic Voice Detection**: Uses VAD (Voice Activity Detection) to detect when you start and stop speaking
+- **Real-Time Transcription**: Converts speech to text as you speak using on-device Whisper models
+- **Segment Tracking**: Each speech segment is timestamped and transcribed separately
+- **Export & Copy**: Export transcripts to text files or copy to clipboard
+- **Statistics**: Track total segments, word count, and processing time
+- **100% Private**: All processing happens locally - no audio leaves your device
+
+### Usage
+1. Navigate to the "Transcription" tab
+2. Click "Start Recording"
+3. Speak naturally - the system will automatically detect speech
+4. View real-time transcriptions as you speak
+5. Click "Stop Recording" when done
+6. Export or copy your transcript
+
+### Technical Details
+- Uses Silero VAD v5 for voice detection
+- Whisper Tiny English model for transcription
+- Processes audio at 16kHz sample rate
+- Minimum 100ms speech duration to avoid noise
+
+See `src/components/TranscriptionTab.tsx` for implementation.
+
+## Smart Note-Taking Assistant
+
+The **Notes** tab provides intelligent voice note-taking with AI-powered organization:
+
+### Features
+- **Voice Input**: Record notes by speaking naturally
+- **Automatic Transcription**: Real-time speech-to-text conversion
+- **AI-Generated Titles**: Automatically creates descriptive titles for your notes
+- **Smart Tagging**: Extracts relevant tags from note content
+- **AI Summarization**: Generate concise summaries of long notes
+- **Organization**: Browse and manage all your notes in a sidebar
+- **Export**: Export all notes to a text file
+
+### Usage
+1. Navigate to the "Notes" tab
+2. Click "Record New Note"
+3. Speak your note content
+4. Click "Stop Recording" when finished
+5. Click "Save Note" - AI will generate a title and tags
+6. Click "Summarize" on any note to generate a summary
+7. Export all notes or manage individual notes
+
+### Technical Implementation
+- Combines VAD, STT, and LLM capabilities
+- Uses LLM to generate titles and extract tags
+- Provides summarization on-demand
+- Notes are stored in browser session (not persistent across refreshes)
+
+See `src/components/NotesTab.tsx` for implementation.
+
+## Meeting Assistant
+
+The **Meetings** tab provides comprehensive meeting recording and analysis:
+
+### Features
+- **Full Meeting Recording**: Record entire meetings with continuous transcription
+- **Real-Time Transcription**: See transcripts appear as people speak
+- **AI-Powered Summaries**: Generate comprehensive meeting summaries
+- **Action Item Extraction**: Automatically identify and list action items
+- **Meeting Management**: Browse and manage all recorded meetings
+- **Export**: Export meetings with transcripts, summaries, and action items
+
+### Usage
+1. Navigate to the "Meetings" tab
+2. Click "Start New Meeting" to begin recording
+3. Speak or let meeting participants speak naturally
+4. Watch the transcript appear in real-time
+5. Click "End Meeting" when finished
+6. Click "Generate Summary" to create an AI summary with action items
+7. Export the full meeting record
+
+### Summary Format
+The AI generates structured summaries including:
+- Brief overview of the meeting (2-3 sentences)
+- Key discussion points (bullet points)
+- Action items with clear next steps
+- Important decisions made
+
+### Technical Details
+- Continuous recording with VAD-based segmentation
+- Each speech segment is timestamped
+- LLM analyzes full transcript to generate summaries
+- Extracts action items automatically
+- Calculates meeting duration and statistics
+
+See `src/components/MeetingTab.tsx` for implementation.
 
 ## Deployment
 
