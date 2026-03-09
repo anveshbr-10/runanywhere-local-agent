@@ -20,6 +20,19 @@ interface STTStreamingSession {
   destroy(): void;
 }
 
+function concatAudioChunks(chunks: Float32Array[]): Float32Array {
+  const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
+  const result = new Float32Array(totalLength);
+  let offset = 0;
+
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return result;
+}
+
 export function TranscriptionTab() {
   const sttLoader = useModelLoader(ModelCategory.SpeechRecognition, true);
 
@@ -42,6 +55,9 @@ export function TranscriptionTab() {
   const segmentStartRef = useRef<Date | null>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const confidenceBufferRef = useRef<number[]>([]);
+  const audioChunksRef = useRef<Float32Array[]>([]);
+  const previewBusyRef = useRef(false);
+  const lastPreviewAtRef = useRef(0);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -94,6 +110,9 @@ export function TranscriptionTab() {
     setStats({ totalSegments: 0, totalWords: 0, sessionDuration: 0, avgConfidence: 0 });
     segmentIdRef.current = 0;
     confidenceBufferRef.current = [];
+    audioChunksRef.current = [];
+    previewBusyRef.current = false;
+    lastPreviewAtRef.current = 0;
 
     // Ensure model is loaded
     const anyMissing = !ModelManager.getLoadedModel(ModelCategory.SpeechRecognition);
@@ -111,9 +130,23 @@ export function TranscriptionTab() {
       // Import STT dynamically
       const { STT } = await import('@runanywhere/web-onnx');
       
-      // Create streaming session
-      const session = STT.createStreamingSession();
-      sessionRef.current = session;
+      // Only zipformer models support streaming sessions.
+      const loadedSpeechModel = ModelManager.getLoadedModel(ModelCategory.SpeechRecognition);
+      const canUseStreaming = Boolean(loadedSpeechModel?.id?.includes('zipformer'));
+
+      // Create streaming session if the current STT model supports it.
+      let session: STTStreamingSession | null = null;
+      let streamingActive = false;
+      if (canUseStreaming) {
+        try {
+          session = STT.createStreamingSession();
+          sessionRef.current = session;
+          streamingActive = true;
+        } catch (streamErr) {
+          console.warn('Streaming STT unavailable; falling back to buffered transcription.', streamErr);
+          sessionRef.current = null;
+        }
+      }
 
       // Create audio capture
       const mic = new AudioCapture({ sampleRate: 16000 });
@@ -121,58 +154,94 @@ export function TranscriptionTab() {
 
       // Handle audio chunks with streaming STT
       const handleAudioChunk = (chunk: Float32Array) => {
-        if (!session) return;
+        // Streaming path (zipformer model)
+        if (session && streamingActive) {
+          try {
+            // Feed audio to streaming session
+            session.acceptWaveform(chunk, 16000);
 
-        // Feed audio to streaming session
-        session.acceptWaveform(chunk, 16000);
+            // Get current result
+            const result = session.getResult();
 
-        // Get current result
-        const result = session.getResult();
+            if (result.text && result.text.trim()) {
+              setCurrentText(result.text.trim());
 
-        if (result.text && result.text.trim()) {
-          setCurrentText(result.text.trim());
+              // If endpoint detected, save segment
+              if (result.isEndpoint) {
+                const segmentEndTime = new Date();
+                const duration = segmentStartRef.current
+                  ? segmentEndTime.getTime() - segmentStartRef.current.getTime()
+                  : 0;
 
-          // If endpoint detected, save segment
-          if (result.isEndpoint) {
-            const segmentEndTime = new Date();
-            const duration = segmentStartRef.current 
-              ? segmentEndTime.getTime() - segmentStartRef.current.getTime()
-              : 0;
+                const confidence = calculateConfidence(result.text);
+                confidenceBufferRef.current.push(confidence);
 
-            const confidence = calculateConfidence(result.text);
-            confidenceBufferRef.current.push(confidence);
+                const segment: TranscriptSegment = {
+                  id: segmentIdRef.current++,
+                  text: result.text.trim(),
+                  timestamp: segmentStartRef.current || new Date(),
+                  duration,
+                  confidence,
+                  isEndpoint: true,
+                };
 
-            const segment: TranscriptSegment = {
-              id: segmentIdRef.current++,
-              text: result.text.trim(),
-              timestamp: segmentStartRef.current || new Date(),
-              duration,
-              confidence,
-              isEndpoint: true,
-            };
+                setSegments((prev) => [...prev, segment]);
 
-            setSegments((prev) => [...prev, segment]);
+                // Update stats
+                const words = result.text.trim().split(/\s+/).length;
+                setStats((prev) => {
+                  const avgConf = confidenceBufferRef.current.reduce((a, b) => a + b, 0) / confidenceBufferRef.current.length;
+                  return {
+                    totalSegments: prev.totalSegments + 1,
+                    totalWords: prev.totalWords + words,
+                    sessionDuration: startTimeRef.current
+                      ? Date.now() - startTimeRef.current.getTime()
+                      : 0,
+                    avgConfidence: avgConf,
+                  };
+                });
 
-            // Update stats
-            const words = result.text.trim().split(/\s+/).length;
-            setStats((prev) => {
-              const avgConf = confidenceBufferRef.current.reduce((a, b) => a + b, 0) / confidenceBufferRef.current.length;
-              return {
-                totalSegments: prev.totalSegments + 1,
-                totalWords: prev.totalWords + words,
-                sessionDuration: startTimeRef.current 
-                  ? Date.now() - startTimeRef.current.getTime()
-                  : 0,
-                avgConfidence: avgConf,
-              };
-            });
-
-            // Reset for next segment
-            session.reset();
-            setCurrentText('');
-            segmentStartRef.current = new Date();
+                // Reset for next segment
+                session.reset();
+                setCurrentText('');
+                segmentStartRef.current = new Date();
+              }
+            }
+            return;
+          } catch (streamChunkErr) {
+            console.warn('Streaming STT failed during capture; switching to buffered transcription.', streamChunkErr);
+            streamingActive = false;
+            try {
+              session.destroy();
+            } catch {
+              // no-op
+            }
+            sessionRef.current = null;
           }
         }
+
+        // Fallback path for offline-only STT models (e.g. whisper)
+        audioChunksRef.current.push(chunk);
+        const now = Date.now();
+        const shouldUpdatePreview = now - lastPreviewAtRef.current > 1500;
+        if (!shouldUpdatePreview || previewBusyRef.current) return;
+
+        previewBusyRef.current = true;
+        lastPreviewAtRef.current = now;
+
+        const previewAudio = concatAudioChunks(audioChunksRef.current);
+        void STT.transcribe(previewAudio, { sampleRate: 16000 })
+          .then((result) => {
+            if (result.text && result.text.trim()) {
+              setCurrentText(result.text.trim());
+            }
+          })
+          .catch((previewErr) => {
+            console.warn('Preview transcription failed:', previewErr);
+          })
+          .finally(() => {
+            previewBusyRef.current = false;
+          });
       };
 
       // Start capturing with proper typing
@@ -188,7 +257,7 @@ export function TranscriptionTab() {
     }
   }, [ensureModels]);
 
-  const stopRecording = useCallback(() => {
+  const stopRecording = useCallback(async () => {
     try {
       // Stop microphone
       micRef.current?.stop();
@@ -235,6 +304,42 @@ export function TranscriptionTab() {
 
         sessionRef.current.destroy();
         sessionRef.current = null;
+      } else if (audioChunksRef.current.length > 0) {
+        // Final pass for offline models
+        const { STT } = await import('@runanywhere/web-onnx');
+        const fullAudio = concatAudioChunks(audioChunksRef.current);
+        const finalResult = await STT.transcribe(fullAudio, { sampleRate: 16000 });
+
+        if (finalResult.text && finalResult.text.trim()) {
+          const segmentEndTime = new Date();
+          const duration = segmentStartRef.current
+            ? segmentEndTime.getTime() - segmentStartRef.current.getTime()
+            : 0;
+
+          const confidence = calculateConfidence(finalResult.text);
+          confidenceBufferRef.current.push(confidence);
+
+          const segment: TranscriptSegment = {
+            id: segmentIdRef.current++,
+            text: finalResult.text.trim(),
+            timestamp: segmentStartRef.current || new Date(),
+            duration,
+            confidence,
+            isEndpoint: true,
+          };
+
+          setSegments((prev) => [...prev, segment]);
+
+          const words = finalResult.text.trim().split(/\s+/).length;
+          setStats((prev) => ({
+            totalSegments: prev.totalSegments + 1,
+            totalWords: prev.totalWords + words,
+            sessionDuration: startTimeRef.current
+              ? Date.now() - startTimeRef.current.getTime()
+              : 0,
+            avgConfidence: confidenceBufferRef.current.reduce((a, b) => a + b, 0) / confidenceBufferRef.current.length,
+          }));
+        }
       }
 
       setCurrentText('');
