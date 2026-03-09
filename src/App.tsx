@@ -5,9 +5,8 @@ import { VisionTab } from './components/VisionTab';
 import { VoiceTab } from './components/VoiceTab';
 import { ToolsTab } from './components/ToolsTab';
 import { SymptomCheckerTab } from './components/SymptomCheckerTab';
-import { TranscriptionTab } from './components/TranscriptionTab';
 
-type Tab = 'chat' | 'vision' | 'voice' | 'tools' | 'symptom' | 'transcription';
+type Tab = 'chat' | 'vision' | 'voice' | 'tools' | 'symptom';
 
 export function App() {
   const [sdkReady, setSdkReady] = useState(false);
@@ -55,9 +54,6 @@ export function App() {
         <button className={activeTab === 'symptom' ? 'active' : ''} onClick={() => setActiveTab('symptom')}>
           Symptoms
         </button>
-        <button className={activeTab === 'transcription' ? 'active' : ''} onClick={() => setActiveTab('transcription')}>
-          Transcription
-        </button>
         <button className={activeTab === 'vision' ? 'active' : ''} onClick={() => setActiveTab('vision')}>
           Vision
         </button>
@@ -72,7 +68,6 @@ export function App() {
       <main className="tab-content">
         {activeTab === 'chat' && <ChatTab />}
         {activeTab === 'symptom' && <SymptomCheckerTab />}
-        {activeTab === 'transcription' && <TranscriptionTab />}
         {activeTab === 'vision' && <VisionTab />}
         {activeTab === 'voice' && <VoiceTab />}
         {activeTab === 'tools' && <ToolsTab />}

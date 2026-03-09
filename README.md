@@ -8,7 +8,6 @@ A comprehensive React + TypeScript application demonstrating **on-device AI in t
 |-----|-------------|
 | **Chat** | Stream text from an on-device LLM (LFM2 350M) |
 | **Medical Symptoms** | Analyze symptoms and get health recommendations using local AI |
-| **Transcription** | Advanced real-time speech-to-text with streaming architecture |
 | **Vision** | Point your camera and describe what the VLM sees (LFM2-VL 450M) |
 | **Voice** | Speak naturally — VAD detects speech, STT transcribes, LLM responds, TTS speaks back |
 | **Tools** | Function calling and structured output demonstrations |
@@ -23,7 +22,6 @@ A comprehensive React + TypeScript application demonstrating **on-device AI in t
 
 ### Advanced AI Capabilities
 - **LLM**: Text generation with streaming, system prompts, and tool calling
-- **STT**: Speech-to-text transcription with Whisper models
 - **TTS**: Neural voice synthesis with Piper TTS
 - **VAD**: Real-time voice activity detection with Silero VAD
 - **VLM**: Vision language models for multimodal understanding
@@ -77,7 +75,6 @@ src/
 ├── components/
 │   ├── ChatTab.tsx              # LLM streaming chat
 │   ├── SymptomCheckerTab.tsx    # Medical symptom analysis
-│   ├── TranscriptionTab.tsx     # Real-time speech-to-text
 │   ├── NotesTab.tsx             # Voice notes with AI organization
 │   ├── MeetingTab.tsx           # Meeting recorder and analyzer
 │   ├── VisionTab.tsx            # Camera + VLM inference
@@ -141,49 +138,6 @@ The symptom checker uses:
 - Responsive UI with clear disclaimers and safety warnings
 
 See `src/components/SymptomCheckerTab.tsx` for the implementation details.
-
-## Advanced Real-Time Transcription
-
-The **Transcription** tab provides cutting-edge speech-to-text with streaming architecture for maximum efficiency:
-
-### Architecture Improvements
-- **Streaming STT**: Uses `STT.createStreamingSession()` for real-time processing
-- **No VAD Required**: Built-in endpoint detection eliminates need for separate VAD
-- **Lower Latency**: Processes audio as it arrives, no waiting for complete segments
-- **Better Accuracy**: Optimized for continuous English speech recognition
-- **Confidence Scoring**: Each segment includes quality metrics
-
-### Features
-- **Real-Time Processing**: See transcription appear as you speak
-- **Automatic Endpoints**: Smart sentence boundary detection
-- **Live Preview**: Current partial transcription shown in real-time
-- **Confidence Metrics**: Visual indicators for transcription quality (Green: >80%, Yellow: 60-80%, Red: <60%)
-- **Session Statistics**: Track segments, words, duration, and average confidence
-- **Export & Copy**: Save transcripts with timestamps and confidence scores
-- **100% Private**: All processing happens locally
-
-### Usage
-1. Navigate to the "Transcription" tab
-2. Click "Start Recording"
-3. Speak naturally - transcription appears in real-time
-4. Text is automatically segmented at natural pause points
-5. Click "Stop Recording" when finished
-6. Export with detailed statistics
-
-### Technical Details
-- **Architecture**: Streaming STT session with continuous audio feed
-- **Model**: Whisper Tiny English (optimized for web)
-- **Sample Rate**: 16kHz mono
-- **Endpoint Detection**: Automatic pause detection (~500ms silence)
-- **Confidence Calculation**: Heuristic-based quality scoring
-
-### Performance
-- **Latency**: <500ms from speech to text
-- **Throughput**: Real-time factor <0.1x (faster than real-time)
-- **Memory**: ~105MB model + ~50MB runtime
-- **CPU Usage**: Efficient WASM execution
-
-See `src/components/TranscriptionTab.tsx` for implementation.
 
 ## Deployment
 
