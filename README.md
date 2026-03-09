@@ -222,6 +222,26 @@ Cross-Origin-Embedder-Policy: credentialless
 - SharedArrayBuffer (requires Cross-Origin Isolation headers)
 - OPFS (for persistent model cache)
 
+## Troubleshooting
+
+### `Failed to load module script ... MIME type of "application/octet-stream"`
+
+This happens when the project source (`index.html` + `/src/main.tsx`) is served by a generic static server.
+
+Use Vite for development:
+
+```bash
+npm install
+npm run dev
+```
+
+For production, build and serve the generated `dist/` directory:
+
+```bash
+npm run build
+npm run preview
+```
+
 ## Documentation
 
 - [SDK API Reference](https://docs.runanywhere.ai)
